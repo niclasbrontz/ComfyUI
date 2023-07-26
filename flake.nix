@@ -25,7 +25,7 @@
         };
 
         python-packages = ps: with ps; [
-          torchWithCuda
+          torch
           torchdiffeq
           torchvision
           torchaudio.overrideAttrs({cudaSupport = false;})
@@ -40,6 +40,8 @@
           scipy
           tqdm
           psutil
+          pip
+          gitpython
         ];
       in
       pkgs.mkShell{
@@ -67,6 +69,11 @@
 
         shellHook = ''
           echo "Staring $name"
+
+          # Make the python virtual environment work
+          export PIP_PREFIX=$(pwd)/_build/pip_packages
+          export PYTHONPATH="$PIP_PREFIX/bin:$PATH"
+          unset SOURCE_DATE_EPOCH
         '';
 
       };

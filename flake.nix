@@ -1,5 +1,6 @@
 {
   description = "ComfyUI";
+
   nixConfig.bash-prompt = "Under development \($PWD\)$ ";
 
   inputs = {
@@ -14,52 +15,38 @@
   outputs = { self, nixpkgs }:
     let
       system = "x86_64-linux";
-    in {
-      devShells."${system}".default = let
-        pkgs = import nixpkgs {
-          inherit system;
-          config = {
-            allowUnfree = true;
-            cudaSupport = true;
-          };
+
+      pkgs = import nixpkgs {
+        inherit system;
+        config = {
+          allowUnfree = true;
+          cudaSupport = true;
         };
+      };
 
-        python-packages = ps: with ps; [
-          torch
-          torchdiffeq
-          torchvision
-          torchaudio.overrideAttrs({cudaSupport = false;})
-          torchsde
-          einops
-          transformers
-          safetensors
-          aiohttp
-          accelerate
-          pyyaml
-          pillow
-          scipy
-          tqdm
-          psutil
-          pip
-          gitpython
-        ];
-      in
-      pkgs.mkShell{
+      python-packages = ps: with ps; [
+        torch
+        torchdiffeq
+        torchvision
+        torchaudio.overrideAttrs({cudaSupport = false;})
+        torchsde
+        einops
+        transformers
+        safetensors
+        aiohttp
+        accelerate
+        pyyaml
+        pillow
+        scipy
+        tqdm
+        psutil
+        pip
+        gitpython
+      ];
+
+    in {
+      devShells."${system}".default = pkgs.mkShell{
         name = "ComfyUI development";
-
-#        buildInputs = with pkgs; [
-#          cudatoolkit
-#          linuxPackages.nvidia_x11
-#          xorg.libXi
-#          xorg.libXmu
-#          freeglut
-#          xorg.libXext
-#          xorg.libX11
-#          xorg.libXv
-#          xorg.libXrandr
-#          zlib
-#          
-#        ];
 
         packages = with pkgs; [
           (python311.withPackages python-packages)

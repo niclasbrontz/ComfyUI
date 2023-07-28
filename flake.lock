@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "comfyUi": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1690422644,
+        "narHash": "sha256-99AuB33YPHlhEUAkRYMloxUj9Vy0PNjg29VR8vLQ+MU=",
+        "owner": "comfyanonymous",
+        "repo": "ComfyUI",
+        "rev": "4ab75d9cb86f55b272d27c17ad82af5d52be390f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "comfyanonymous",
+        "repo": "ComfyUI",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1690272529,
+        "narHash": "sha256-MakzcKXEdv/I4qJUtq/k/eG+rVmyOZLnYNC2w1mB59Y=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "ef99fa5c5ed624460217c31ac4271cfb5cb2502c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "comfyUi": "comfyUi",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

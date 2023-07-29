@@ -35,7 +35,7 @@ When running `nix build` a directory named `result` will be generated. Don't rem
 If you are using Automatic1111 and you don't want to have your models in two places, update the file `extra_model_paths.yaml` in the ComfyUI directory.
 
 ## About this flake
-Please note that I'm very new to nix. I have only used it for a few weeks so there might be some bad design decisions. It only work on x86_74-linux as that is my computer, feel free to test it on other systems (you will need to update the flake). It builds everything with CUDA support, so you need a good nvidia graphics card.
+Please note that I'm very new to nix. I have only used it for a few weeks so there might be some bad design decisions. It only work on x86_64-linux as that is my computer, feel free to test it on other systems (you will need to update the flake). It builds everything with CUDA support, so you need a good nvidia graphics card.
 
 ## License
 Feel free to use and update this flake as you whish. As I don't own ComfyUI, make sure to follow their license.

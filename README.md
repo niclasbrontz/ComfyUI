@@ -8,7 +8,7 @@ Make a directory where the files and directories that ComfyUI needs for configur
 
 i.e. `sudo mkdir /var/ComfyUI`, followed by `sudo chmod -R 777 /var/ComfyUI`.
 
-If you want to plase it somewhere else, update `flake.nix` (the `user_directory` key).
+If you want to place it somewhere else, update `flake.nix` (the `user_directory` key).
 
 Run `nix build` in the directory containing the flake.
 

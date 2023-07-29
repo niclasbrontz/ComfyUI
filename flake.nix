@@ -14,7 +14,7 @@
 
   outputs = { self, nixpkgs, comfyUi }:
     let
-      user_directory = "/var/comfyUI/";
+      user_directory = "/var/ComfyUI/";
 
       system = "x86_64-linux";
 
@@ -54,7 +54,7 @@
         '';
       };
 
-      create_comfy_structure = pkgs.writeScriptBin "create_comfy_structure" ''
+      create_comfy_structure = pkgs.writeScriptBin "create_comfy_structure.sh" ''
         set -e
 
         mkdir ${user_directory}/models

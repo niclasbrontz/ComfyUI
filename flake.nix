@@ -14,6 +14,8 @@
 
   outputs = { self, nixpkgs, comfyUi }:
     let
+      user_directory = "/var/comfyUI/";
+
       system = "x86_64-linux";
 
       pkgs = import nixpkgs {
@@ -23,6 +25,47 @@
           cudaSupport = true;
         };
       };
+
+      comfy_patched = pkgs.runCommand "patch-comfy" {} ''
+        set -e
+
+        mkdir $out
+        cp -rp ${comfyUi}/* $out
+        mv $out/models $out/models-template
+        chmod 777 -R $out/output
+        rm -rf $out/output
+        ln -s ${user_directory}/models $out/models
+        ln -s ${user_directory}/output $out/output
+        ln -s ${user_directory}/extra_model_paths.yaml $out/extra_model_paths.yaml
+      '';
+
+      comfy_start_script = pkgs.writeShellApplication {
+        name = "comfyUi_start.sh";
+
+        runtimeInputs = python_input;
+
+        text = ''
+          PIP_PREFIX=$(pwd)/_build/pip_packages
+          export PIP_PREFIX
+          export PYTHONPATH="$PIP_PREFIX/bin:$PATH"
+          unset SOURCE_DATE_EPOCH
+
+          python ${comfy_patched}/main.py
+        '';
+      };
+
+      create_comfy_structure = pkgs.writeScriptBin "create_comfy_structure" ''
+        set -e
+
+        mkdir ${user_directory}/models
+        cp -rp ${comfy_patched}/models-template/* ${user_directory}/models/
+
+        mkdir ${user_directory}/output
+
+        cp ./extra_model_paths.yaml ${user_directory}/extra_model_paths.yaml
+
+        chmod -R ugo+rwX ${user_directory}*
+      '';
 
       python-packages = ps: with ps; [
         torch
@@ -44,45 +87,21 @@
         gitpython
       ];
 
+      python_input = with pkgs; [
+        (python311.withPackages python-packages)
+      ];
+  
     in {
-      packages."${system}".default = pkgs.stdenv.mkDerivation  {
-        name = "ComfyUI";
+      packages."${system}".default = pkgs.symlinkJoin {
+        name = "comfyUI";
 
-        buildInputs = with pkgs; [
-          (python311.withPackages python-packages)
-        ];
-        
-#        unpackPhase = "cp ${./extra_model_paths.yaml} ${comfyUi}/extra_model_paths.yaml";
-        unpackPhase = ":";
 
-        installPhase = ''
-          # An ugly hack to make the patchshebang hook run for the python stuff
-          install -m755 -D ${./startComfyUI.py} $out/bin/startComfyUI.py
-          echo "
-          import sys
-
-          sys.path.insert(1, '${comfyUi}')
-
-          with open(\"${comfyUi}/main.py\") as f:
-            exec(f.read())" >> $out/bin/startComfyUI.py
-
-          # We have a few environment variables that needs to be specified
-          echo "
-          export PIP_PREFIX=$(pwd)/_build/pip_packages
-          export PYTHONPATH="$PIP_PREFIX/bin:$PATH"
-          unset SOURCE_DATE_EPOCH
-          $out/bin/startComfyUI.py " > $out/bin/startComfyUI.sh
-
-          chmod 755 $out/bin/startComfyUI.sh
-
-        '';
-
-        postPatch = "cp ${./extra_model_paths.yaml} ${comfyUi}/extra_model_paths.yaml";
+        paths = [ comfy_start_script create_comfy_structure ];
       };
 
       apps."${system}".default = {
         type = "app";
-        program = "${self.packages.${system}.default}/bin/startComfyUI.sh";
+        program = "${self.packages.${system}.default}/bin/comfyUi_start.sh";
       };
 
       devShells."${system}".default = pkgs.mkShell{
@@ -92,12 +111,10 @@
           (python311.withPackages python-packages)
         ];
 
-#        profile = ''export CUDA_PATH=${pkgs.cudatoolkit}'';
-
         shellHook = ''
           echo "Staring $name"
 
-          echo "${comfyUi}"
+          echo "ComfyUI that is started if we run 'nix run' ${comfy_patched}"
 
           # Make the python virtual environment work
           export PIP_PREFIX=$(pwd)/_build/pip_packages

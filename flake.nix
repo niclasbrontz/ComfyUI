@@ -34,6 +34,7 @@
         mv $out/models $out/models-template
         chmod 777 -R $out/output
         rm -rf $out/output
+        ln -s ${user_directory}/models $out/temp
         ln -s ${user_directory}/models $out/models
         ln -s ${user_directory}/output $out/output
         ln -s ${user_directory}/extra_model_paths.yaml $out/extra_model_paths.yaml
@@ -57,10 +58,12 @@
       create_comfy_structure = pkgs.writeScriptBin "create_comfy_structure.sh" ''
         set -e
 
-        mkdir ${user_directory}/models
+        mkdir -p ${user_directory}/temp
+
+        mkdir -p ${user_directory}/models
         cp -rp ${comfy_patched}/models-template/* ${user_directory}/models/
 
-        mkdir ${user_directory}/output
+        mkdir -p ${user_directory}/output
 
         cp ./extra_model_paths.yaml ${user_directory}/extra_model_paths.yaml
 
